@@ -35,19 +35,23 @@ chmod +x ~/.claude/hooks/post-compact.sh ~/.claude/hooks/auto-document.sh
 # Session summary prompt
 cp "$SCRIPT_DIR/.claude/skills/document-session.md" ~/.claude/skills/
 
-# Global CLAUDE.md (prompt before overwriting if it exists)
+# Global CLAUDE.md — append if exists, copy if not
 if [ -f ~/.claude/CLAUDE.md ]; then
+  # Always back up first
+  BACKUP="$HOME/.claude/CLAUDE.md.bak.$(date +%F-%H%M%S)"
+  cp ~/.claude/CLAUDE.md "$BACKUP"
   echo ""
-  echo "~/.claude/CLAUDE.md already exists. Diff:"
-  diff ~/.claude/CLAUDE.md "$SCRIPT_DIR/.claude/CLAUDE.md" || true
-  echo ""
-  read -p "Overwrite? (y/N) " -n 1 -r
-  echo
-  if [[ $REPLY =~ ^[Yy]$ ]]; then
-    cp "$SCRIPT_DIR/.claude/CLAUDE.md" ~/.claude/CLAUDE.md
-    echo "Overwritten."
+  echo "Backed up ~/.claude/CLAUDE.md → $BACKUP"
+
+  # Check if our content is already present (idempotent re-runs)
+  if grep -qF "PROJECT.md — keep it current" ~/.claude/CLAUDE.md; then
+    echo "Dev Note instructions already in ~/.claude/CLAUDE.md — skipping."
   else
-    echo "Skipped. Merge ~/.claude/CLAUDE.md manually if needed."
+    echo "Appending Dev Note instructions to ~/.claude/CLAUDE.md..."
+    echo "" >> ~/.claude/CLAUDE.md
+    echo "---" >> ~/.claude/CLAUDE.md
+    cat "$SCRIPT_DIR/.claude/CLAUDE.md" >> ~/.claude/CLAUDE.md
+    echo "Appended."
   fi
 else
   cp "$SCRIPT_DIR/.claude/CLAUDE.md" ~/.claude/CLAUDE.md
