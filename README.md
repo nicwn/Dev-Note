@@ -52,7 +52,7 @@ A global `~/.claude/CLAUDE.md` tells Claude to create and maintain `PROJECT.md` 
 ## Install
 
 ```bash
-git clone https://github.com/yourname/dev-note.git
+git clone https://github.com/nicwn/Dev-Note.git
 cd dev-note
 bash install.sh
 ```
