@@ -18,7 +18,8 @@ CWD=$(echo "$INPUT" | jq -r '.cwd // empty')
 [ -z "$CWD" ] && exit 0
 [ ! -f "$TRANSCRIPT" ] && exit 0
 
-PROJECT=$(basename "$CWD")
+MAIN_WORKTREE=$(git -C "$CWD" worktree list --porcelain 2>/dev/null | awk '/^worktree /{print $2; exit}')
+PROJECT=$(basename "${MAIN_WORKTREE:-$CWD}")
 DATE=$(date +%F)
 LOG_DIR="$HOME/claude-dev-logs/$PROJECT"
 SKILL="$HOME/.claude/skills/document-session.md"
